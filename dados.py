@@ -17,6 +17,7 @@ lif246 = pd.read_csv('LIF246.TXT', sep='\t', encoding='latin-1').replace(',', '.
 lifalph = pd.read_csv('LIFKALPH.TXT', sep='\t', encoding='latin-1').replace(',', '.', regex=True)
 lifcni = pd.read_csv('LIFCNI.TXT', sep='\t', encoding='latin-1').replace(',', '.', regex=True)
 Dados = ods.read_ods('Dados.ods', 1)
+EspAlCu = ods.read_ods('EspAlCu.ods',1)
 
 #                                                               #
 
@@ -38,6 +39,16 @@ lifcni = lifcni.values[1:].astype(float)
 
 # Funções
 
+
+# A função get_error tem como input um array[N, M] e retorna um array do error[N, 1]
+# error foi calculado como sum(abs(array - med)).
+# Em resumo ela retorna o erro das colunas de um array [a, b, c, ...]
+def get_error(array):
+    med = np.sum(array, axis=1)[:, np.newaxis]/array.shape[1]
+    return np.sum(abs(array-med),axis=1)[:, np.newaxis]
+
+
+# Função get_name apenas pega o nome de uma variavel e a retorna como str
 def get_name(data):
 
     for name, value in globals().items():
@@ -45,15 +56,17 @@ def get_name(data):
             return name
 
 
-def get_alpha_beta(data): # Esta função da a posição de alpha e beta, 
-                          # mas na verdade apenas ganhamos os dois maiores
-                          # picos a uma distancia de 10 medidas de angulo
-
+# Esta função da a posição de alpha e beta, 
+# mas na verdade apenas ganhamos os dois maiores
+# picos a uma distancia de 10 medidas de angulo def get_alpha_beta(data):
+def get_alpha_beta(data):                         
+                         
     peaks, _ = find_peaks(data[:, 1], height = 100, distance = 10)
     alpha_beta = peaks[np.argsort(data[peaks, 1])[-2:]]
     return alpha_beta
 
 
+# get_graph retorna um grafico simples com nome da variavel e alpha_beta
 def get_graph(data):
 
     fig, ax = plt.subplots()
@@ -84,16 +97,3 @@ def get_graph(data):
 #lifcni 
 
 #                                                           #
-
-plt.style.use('dark_background')
-get_graph(lif194)
-#print(lif194[get_alpha_beta(lif194)])
-
-
-
-
-
-
-
-
-
